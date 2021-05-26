@@ -1,0 +1,15 @@
+{
+  "name": "classiest",
+  "version": "0.0.1",
+  "description": "🍸 Create classes with overloadable methods, getters, setters, and statics!",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Francis Stokes",
+  "license": "MIT",
+  "dependencies": {
+    "tcomb": "^3.2.29",
+    "tcomb-validation": "^3.4.1"
+  }
+}
