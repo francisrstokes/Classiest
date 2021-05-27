@@ -1,8 +1,7 @@
 const t = require('tcomb');
-const {validate} = require('tcomb-validation');
 
 const D = {};
-D.ValidClassName = t.refinement(t.String, x => x.length > 0 && /[A-Z][a-z0-9_]*/i.test(x));
+D.ValidClassName = t.refinement(t.String, x => /[A-Z][a-z0-9_]*/i.test(x));
 
 D.ArgArray = t.list(t.Type);
 D.OverloadDescription = t.interface({
@@ -23,7 +22,7 @@ D.Defintion = t.interface({
 const Instance = c => t.refinement(t.Any, x => x instanceof c);
 
 const Classiest = (name, descriptorFn) => {
-  if (!validate(name, D.ValidClassName).isValid()) {
+  if (!D.ValidClassName.is(name)) {
     throw new Error(`Invalid class name: ${name}`);
   }
 
@@ -35,20 +34,11 @@ const Classiest = (name, descriptorFn) => {
     }
   };
 
-  const descriptor = descriptorFn(cstr, Instance(cstr));
-  const validityResult = validate(descriptor, D.Defintion);
-
-  if (!validityResult.isValid()) {
-    debugger;
-    throw new Error(validityResult.firstError());
-  }
+  const descriptor = D.Defintion(descriptorFn(cstr, Instance(cstr)));
 
   const dynamicDispatch = function(methodName, methodImpls, ...methodArgs) {
     for (let {args, fn} of methodImpls) {
-      const matches = args.every((typeArg, i) => (
-        validate(methodArgs[i], typeArg).isValid()
-      ));
-
+      const matches = args.every((typeArg, i) => typeArg.is(methodArgs[i]));
       if (matches) {
         return fn.apply(this, methodArgs);
       }

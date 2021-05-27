@@ -9,7 +9,6 @@
   "author": "Francis Stokes",
   "license": "MIT",
   "dependencies": {
-    "tcomb": "^3.2.29",
-    "tcomb-validation": "^3.4.1"
+    "tcomb": "^3.2.29"
   }
 }
