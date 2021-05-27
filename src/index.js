@@ -95,9 +95,13 @@ const Classiest = (name, descriptorFn) => {
       propertyDefintion.get = getters[key];
     }
     if (key in setters) {
-      propertyDefintion.set = function (value) {
-        return dynamicDispatch.call(this, key, setters[key], value);
-      };
+      if (typeof setters[key] === 'function') {
+        propertyDefintion.set = setters[key];
+      } else {
+        propertyDefintion.set = function (value) {
+          return dynamicDispatch.call(this, key, setters[key], value);
+        };
+      }
     }
     Object.defineProperty(cstr.prototype, key, propertyDefintion);
   });
