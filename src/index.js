@@ -1,7 +1,7 @@
 const t = require('tcomb');
 
 const D = {};
-D.ValidClassName = t.refinement(t.String, x => /[A-Z][a-z0-9_]*/i.test(x));
+D.ValidClassName = t.refinement(t.String, x => /^[a-z][a-z0-9_]*/i.test(x));
 
 D.ArgArray = t.list(t.Type);
 D.OverloadDescription = t.interface({
