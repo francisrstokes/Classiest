@@ -1,4 +1,5 @@
 node_modules/
 .sketchpad/
 coverage/
+.nyc_output/
 .vscode
