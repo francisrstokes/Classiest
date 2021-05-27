@@ -1,6 +1,6 @@
 {
   "name": "classiest",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "🍸 Create classier classes with overloadable methods, getters, setters, and statics!",
   "main": "src/index.js",
   "scripts": {
