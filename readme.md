@@ -1,5 +1,10 @@
 # Classiest
 
+- [About](#About)
+- [Installation](#Installation)
+- [FAQ](#FAQ)
+- [Example Usage](#Example-Usage)
+
 ## About
 
 `Classiest` allows you to write classier classes by providing the **rich type-checking on arguments to methods** through tcomb and **overloadable constructors, methods, setters, and static methods**.
@@ -10,7 +15,101 @@
 npm i classiest
 ```
 
-## Usage
+## FAQ
+
+### Why are you trying to make JS something it's not?
+
+JavaScript is a dynamicly and weakly typed language. That means that the types aren't known until runtime, and that they can change during the execution of the program. So if this is the nature of the language, why would you try to add typing on top of it? Well the answer is that **you are already doing this all the time already,** just in an ad-hoc and potentially buggy manner. Let me explain.
+
+It's common in JS that you want to write methods that can respond to various different kinds of inputs, but the language doesn't allow overloading, so you're forced to use one of a few different suboptimal approaches.
+
+```javascript
+class Vector3 {
+  // ...
+
+  add(vectorOrNumber) {
+    if (vectorOrNumber instanceof Vector3) {
+      return new Vector3(
+        this.x + vectorOrNumber.x,
+        this.y + vectorOrNumber.y,
+        this.z + vectorOrNumber.z
+      );
+    } else if (typeof vectorOrNumber === 'number') {
+      return new Vector3(
+        this.x + vectorOrNumber,
+        this.y + vectorOrNumber,
+        this.z + vectorOrNumber
+      );
+    }
+
+    throw new Error(`This methods requires either a Vector3 or a number, but got ${typeof vectorOrNumber}`);
+  }
+}
+```
+
+I'm sure you've seen this kind of code before - we're explicitly checking the types of the inputs and choosing a codepath accordingly. The logic of checking types is mixed together with the effects of the method, and it gets longer and harder to understand with the more cases we allow for. This just compounds when the method potentially takes more than one argument.
+
+```javascript
+class Vector3 {
+  // ...
+
+  addVector3(v) {
+    return new Vector3(
+      this.x + v.x,
+      this.y + v.y,
+      this.z + v.z
+    );
+  }
+
+  addNumber(n) {
+    return new Vector3(
+      this.x + n,
+      this.y + n,
+      this.z + n
+    );
+  }
+}
+```
+
+This is a little better, but there are still some issues. Firstly, this is basically ad-hoc overloading where we expect the user to maintain the type system in their mind while they code. Second, we've lost the `instanceof/typeof` checks, so if a user makes a quick refactoring of a `Vector3` to `number`, but forgets to change the method name, they're going to experience some weirdness (and not necessarily at the moment when the method is called!).
+
+Let's be clear here: In both cases, we're already trying to enforce type checks, and dispatch behaviours based on those types!
+
+### You should just be using TypeScript!
+
+Well first of all that's not a question.
+
+TypeScript is great - I love TypeScript! And what's more: It actually has overloading - which no doubt works in much the same way as Classiest when it's compiled down to JS (so discussions about performance would not be applicable here).
+
+If you're starting a new project, and the rest of team is on board, then TS can be a great choice. But the reality is that many projects are ongoing. They may not have the luxury of switching, or even if they did it just might not add that much, or be worth the effort.
+
+### Isn't this going to be bad for performance?
+
+Classiest is an *abstraction*, and every abstraction has some cost associated with it. In this library there are three costs to think about:
+
+#### Up-front cost
+
+When we define a class with Classiest, the library needs to do some work to build up the class from it's definition. This is a one time cost, probably happening at application start up time, and honestly probably isn't even worth worrying about.
+
+#### Runtime cost
+
+When we call methods on a class built with Classiest, it must internally analyze the arguments provided and attempt to find a matching implementation. That means we need to iterate through at least some of the implementations, and run all the associated code that tcomb uses for type checking. We're also necessarily adding a deeper nesting to the call stack.
+
+Thinking a little bit deeper about this, we need to realise that modern JS engines are almost always JIT compiled, and use a whole host of heuristics about the code to apply optimisations to the generated machine instructions that end up running on the CPU - all with the aim of producing faster and more efficient code. There is a risk that this layer of abstraction will make it harder for the JIT to do its job effectively.
+
+#### Cognitive cost
+
+Any time you include an abstraction in your code, you add something new you need to understand. The best abstractions are designed so you only need to understand the high level concept, and any knowledge about the underlying system should be irrelevant ([but that doesn't always happen](https://en.wikipedia.org/wiki/Leaky_abstraction)).
+
+With Classiest, you need to learn that you create classes with a function instead of with the class keyword, you need to learn about the format of the description object, and you need to learn a little about tcomb - its built in types and maybe how to define your own types as well. That's about it.
+
+#### Making the tradeoff
+
+Everything in software (and perhaps life) is about tradeoffs. Making an informed decision about using this or any other library is basically assessing the costs described above, accounting for how your project will need to use the library and what performance characteristics you require.
+
+And all of that said, performance is something you **measure**, not make assumptions about. Different JS engines have different performance characteristics, and so code that performs well in one engine may perform worse in another. People often say premature optimisation is the root of all evil - and while I'm not sure I'd go that far, I'd say you're doing yourself an intellectual disservice by not taking proper stock of reality.
+
+## Example Usage
 
 ```javascript
 const {Classiest, tcomb: t} = require('classiest');
