@@ -9,6 +9,8 @@
 
 `Classiest` allows you to write classier classes by providing the **rich type-checking on arguments to methods** through tcomb and **overloadable constructors, methods, setters, and static methods**.
 
+[The base of this library was live coded on the Low Level JavaScript YouTube channel.](https://www.youtube.com/watch?v=F-fa_yXcJbc)
+
 ## Installation
 
 ```bash
